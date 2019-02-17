@@ -143,7 +143,7 @@
 		  </div>
 		  <div class="modal-body ver">
 			  <p><strong>Please open the notification in your app and speak the below string to verify yourself</strong></p>
-			  <pre id="challenge-text"></pre>
+			  <pre id="challenge-text" style="font-size: 20px;"></pre>
 		  </div>
 			<div class="modal-body done" style="display: none;">
 			  <h2>Your are feeling:</h2>
@@ -279,6 +279,8 @@
 							
 							if (data.status == 1) {
 								$("#challenge-text").html(data.words);
+								$(".modal-body.ver").css('display', 'block');
+								$(".modal-body.done").css('display', 'none');
 								$("#challenge-modal").modal('show');
 							}
 							
