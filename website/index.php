@@ -117,7 +117,7 @@
 										</div>
 									</div><!-- no whitespace in between inline elements
 								 --><div class="split split-right">
-										<h4>Purchases</h4>
+										<h4><strong>Purchases</strong></h4>
 										<div class="transactions">
 											<div class="transaction-list">
 												Loading...
@@ -152,13 +152,28 @@
 
     <!-- preview scripts -->
     <script>
+		
+		var status_text = ['Pending', 'Awaiting Verification', 'Verification Failed', 'Completed'];
+		var status_icon = ['<i title="Pending" style="color: skyblue;" class="fa fa-circle"></i>', '<i title="Awaiting Verification" style="color: gold;" class="fa fa-minus"></i>', '<i title="Verification Failed" style="color: red;" class="fa fa-times"></i>', '<i title="Completed" style="color: darkgreen;" class="fa fa-check"></i>'];
+		
         (function($) {
 
+			var images = new Array()
+			function preload() {
+				for (i = 0; i < preload.arguments.length; i++) {
+					images[i] = new Image()
+					images[i].src = preload.arguments[i]
+				}
+			}
+			preload(
+				"/img/spin.gif"
+			)
+			
 			$(document).ready(function() {
 				$.get('/api/get-all-purchases', function(data) {
 					$(".transaction-list").html('');
 					for (element in data) {
-						$(".transaction-list").prepend('<p>$' + data[element].amt + ' @ ' + data[element].merchant.name + '</p>');
+						$(".transaction-list").prepend('<p>' + status_icon[data[element].status] + ' <strong>$' + data[element].amt + '</strong> @ ' + data[element].merchant.name + '</p>');
 					}
 				});
 				$.get('/api/get-all-merchants', function(data) {
@@ -189,13 +204,15 @@
 						$('#description').addClass('format-error');
 					} else {
 						// success
+						$(".transaction-list").prepend('<p><img style="width: 30px;" src="/img/spin.gif"/></p>');
 						
 						$.post('/api/create-transaction', {amount: amount, merchant: merchant, date: date, description: description}, function(data) {
-							console.log(data);
-							$(".transaction-list").prepend('<p>$' + amount + ' @ ' + merchant[1].split(',')[0] + '</p>');
-							$('#amount').val('');
-							$('#merchant').val('');
-							$('#description').val('');
+							console.log(data, $('#merchant').children("option:selected").text());
+							
+							$(".transaction-list > p:first-of-type").html(status_icon[data.status] + ' $<strong>' + amount + '</strong> @ ' + $('#merchant').children("option:selected").text());
+							//$('#amount').val('');
+							//$('#merchant').val('');
+							//$('#description').val('');
 						});
 						
 						return true;
