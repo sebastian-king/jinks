@@ -10,8 +10,8 @@ function send_push_notification_android($receiver_id, $message, $data = array())
 	
 	$post = array(
 		'to' => $receiver_id,
-		'data' => $data,
-		'click_action' => ''
+		'notification' => $data,
+		'data' => $data
 	);
 	
 	$post = json_encode($post);

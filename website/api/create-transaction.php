@@ -5,6 +5,17 @@ require('get-merchant.php');
 
 header('Content-Type: application/json');
 
+function get_words($n) {
+	$dictionary = file_get_contents('eff_large_wordlist.txt');
+	$words = "";
+	for ($i = 0; $i < $n; $i++) {
+		$random = rand(1,6) . rand(1,6) . rand(1,6) . rand(1,6) . rand(1,6);
+		preg_match("@^$random\t(.+)@m", $dictionary, $m);
+		$words .= $m[1] . ' ';
+	}
+	return trim($words);
+}
+
 function create_transaction($merchant_id, $amount, $description, $date) {
 	$ch = curl_init();
 
@@ -42,6 +53,8 @@ $description = $_POST['description'];
 $transaction = create_transaction($merchant, $amount, $description, $date);
 $transaction_id = $transaction->objectCreated->_id;
 
+$words = "";
+
 if (floatval($amount) > 100) {
 	$transaction->status = 0;
 
@@ -52,11 +65,18 @@ if (floatval($amount) > 100) {
 		'Check transaction: $' . $amount . ' @ ' . $merchant->name,
 		array('id' => $transaction_id)
 	);
+	$words = get_words($dictionary, 5);
 } else {
 	$transaction->status = 3;
 }
-$q = $db->query('INSERT INTO transaction_log (transaction_id, status)
-	VALUES ("' . $db->real_escape_string($transaction_id) . '", "' . $db->real_escape_string($transaction->status) . '")') or die($db->error);
+$q = $db->query('INSERT INTO transaction_log (transaction_id, status, word_challenge)
+	VALUES (
+		"' . $db->real_escape_string($transaction_id) . '",
+		"' . $db->real_escape_string($transaction->status) . '",
+		"' . $words . '"
+	)') or die($db->error);
+
+$transaction->words = $words;
 
 error_log(var_export($push, true));
 
