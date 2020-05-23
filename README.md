@@ -1,5 +1,5 @@
 # JINKS
-![Jinks Logo](branding/logo(Dark).png)
+![Jinks Logo](branding/logo(dark).png)
 
 JINKS is an in-development technology that leverages an android app, PHP, cURL, Node.JS, Python and a REST API in order to verify if the user is in a stable state of mind.
 
